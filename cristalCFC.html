@@ -2,88 +2,127 @@
     <head>
         <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
         <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-        
     </head>
     <body >
-        <a-scene    initialisation 
-                    embedded                    
+        <a-scene    initialisation embedded                    
                     arjs=' detectionMode: mono_and_matrix; 
                            matrixCodeType: 3x3;
                            sourceType: webcam; 
-                           sourceWidth:1280; 
-                           sourceHeight:960; 
-                           displayWidth: 1280; 
-                           displayHeight: 960;
+                           sourceWidth:640; 
+                           sourceHeight:480; 
+                           displayWidth: 640; 
+                           displayHeight: 480;
                            ' 
-                    renderer='precision: medium; antialias:true'
-        >
-            <a-marker type="barcode" value='7' >
-                <a-entity id="cristal" scale='0.2 0.2 0.2'>
+                    renderer='precision: medium; antialias:true'>            
+            <!-- structure cubique face centrée avec plans ABCABC -->
+            <a-marker type="barcode" value='1' >
+                <a-entity id="cristalCFCcouleurs" scale='0.2 0.2 0.2'>
+                    <!-- rempli lors de l'initialisation-->
+                </a-entity>                           
+            </a-marker>              
+            <!-- structure cubique face centrée   -->
+            <a-marker type="barcode" value='2' >
+                <a-entity id="cristalCFC" scale='0.2 0.2 0.2'>
+                    <!-- rempli lors de l'initialisation-->
+                </a-entity>                           
+            </a-marker>              
+            <!-- structure cubique simple   -->
+            <a-marker type="barcode" value='3' >
+                <a-entity id="cristalCS" scale='0.2 0.2 0.2'>
                     <!-- rempli lors de l'initialisation-->
                 </a-entity>                           
             </a-marker>  
-            
-            <a-entity camera></a-entity>  
-        
-        </a-scene>  
-        
+            <a-entity camera></a-entity>          
+        </a-scene>          
     </body>
     <script>
-        var parameters = {
-            // type of source - ['webcam', 'image', 'video']
-            sourceType: "webcam",
-            // url of the source - valid if sourceType = image|video
-            sourceUrl: null,
-            // resolution of at which we initialize the source image
-            sourceWidth: 640,
-            sourceHeight: 480,
-            // resolution displayed for the source
-            displayWidth: 640,
-            displayHeight: 480
-        };
-        
+        // dimensions du cristal
+        var xMax = 2;
+        var yMax = 5;
+        var zMax = 2;
+        var xMin = -2;
+        var yMin = 0;
+        var zMin = -2;
+        // génération des différents cristaux
         AFRAME.registerComponent('initialisation', {
             init: function () {
-                var sceneEl = document.querySelector('#cristal');
+                // cubique face centrée avec plans ABC
+                var sceneEl = document.querySelector('#cristalCFCcouleurs');
                 var x;
                 var y;
                 var z;
-                var xMax = 2;
-                var yMax = 5;
-                var zMax = 2;
-                var xMin = -2;
-                var yMin = 0;
-                var zMin = -2;
-
-               for(x=xMin ; x < xMax ; x++){
-                    for(y=yMin ; y < yMax ; y++){
-                        for(z=zMin ; z < zMax ; z++){                            
-                            addCellule(x,y,z,sceneEl);
+               for(x=xMin ; x < xMax + 1 ; x++){
+                    for(y=yMin ; y < yMax + 1 ; y++){
+                        for(z=zMin ; z < zMax + 1 ; z++){                            
+                            addCellule(x,y,z,sceneEl,"CFCcouleur");
                         }
                     }
                }
-                
-                      
-                
+               // cubique face centrée 
+               sceneEl = document.querySelector('#cristalCFC');
+               for(x=xMin ; x < xMax + 1 ; x++){
+                    for(y=yMin ; y < yMax + 1 ; y++){
+                        for(z=zMin ; z < zMax + 1 ; z++){                            
+                            addCellule(x,y,z,sceneEl,"CFC");
+                        }
+                    }
+               }
+               // cubique simple
+               sceneEl = document.querySelector('#cristalCS');
+               for(x=xMin ; x < xMax + 1 ; x++){
+                    for(y=yMin ; y < yMax + 1 ; y++){
+                        for(z=zMin ; z < zMax + 1 ; z++){                            
+                            addCellule(x,y,z,sceneEl,"CS");
+                        }
+                    }
+               }
             }
         });
 
-        function addCellule(x,y,z, scene){
-            scene.appendChild(addAtome(x,y,z,'green'));
-            scene.appendChild(addAtome(x+0.5,y+0.5,z,'gray'));
-            scene.appendChild(addAtome(x+0.5,y,z+0.5,'gray'));
-            scene.appendChild(addAtome(x,y+0.5,z+0.5,'gray'));
+        function addCellule(x,y,z, scene,code){
+            // en fonction de code, on construit la maille élémentaire
+             // cubique face centrée
+             if ((code == "CFCcouleur") || (code == "CFC") ){
+                addAtome(x,y,z,scene,code);
+                addAtome(x+0.5,y+0.5,z,scene,code);
+                addAtome(x+0.5,y,z+0.5,scene,code);
+                addAtome(x,y+0.5,z+0.5,scene,code);
+            }
+            // cubique simple
+            if (code == "CS") {
+                addAtome(x,y,z,scene,code);
+            }
         }
 
-
-
-        function addAtome(x,y,z,c){
+        function addAtome(x,y,z,scene,code){            
+            var couleurs =[ 'red' , 'orange' , 'yellow', 'gray' , 'white' ];
+            //  en fonction de code, on gère la couleur de l'atome
+            var c = couleurs[4];            
+            if ( code == "CFCcouleur"){
+                // plans ABCABC hexagonale compacte
+                var d = Math.abs((x + y + z ) % 3 );
+                c= couleurs[d];
+            }
+            if ((code == "CFC") || (code == "CS")){
+                c= couleurs[3];
+            }
+            // maille élémentaire avec couleur spécifique
+            if( (x <= xMin+1) && (y <= yMin+1) && (z <= zMin+1)){
+                c=couleurs[4];
+            }
+            // dessin de l'atome, en fonction de code , on gère la taille de l'atome
+            var rayon = '0.5';
+            if ((code == "CFCcouleur") || code =="CFC"){
+                rayon = '0.354';
+            }
+            // construction de l'atome
             var atome = document.createElement('a-sphere');
             atome.setAttribute('position', x+' '+y+' '+z);
-            atome.setAttribute('radius', '0.354');
-            atome.setAttribute('color', c);                    
-            return atome
+            atome.setAttribute('radius', rayon);
+            if ((x <= xMax ) && (y <= yMax ) && (z <= zMax )){
+                atome.setAttribute('color', c);               
+                scene.appendChild(atome);
+            }                 
         }
-
     </script>
 </html>
