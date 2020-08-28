@@ -1,0 +1,127 @@
+<html>
+	<head>	
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="UTF-8">
+		<script src="p5.js"></script>
+		<script src="p5.sound.js"></script>
+		<style>
+			body{
+				width: 25%;
+				margin-left: auto;
+				margin-right: auto;
+			}
+			#inter{
+				width:150pt;
+			}
+			#synthe{
+				width:150pt;
+			}
+		</style>
+	</head>
+	<body>
+		  <fieldset id="synthe">
+		  <legend>Synthétiseurs actifs</legend>
+		  <div>
+		    <input type="checkbox" id="synthetiseur1" name="synthetiseur1" value="1"  checked>
+			<label for="synthetiseur1">Synthétiseur 1</label>
+		   </div>
+		   <div>
+		    <input type="checkbox" id="synthetiseur2" name="synthetiseur2" >
+			<label for="synthetiseur2">Synthétiseur 2</label>
+		    </div>
+		 </fieldset>
+		 <br>
+		
+		 <fieldset id="inter">
+		    <legend>Les intervalles</legend>
+			    <input type="radio" name="intervalle" value="1" >unisson <br>
+			    <input type="radio" name="intervalle" value="2" >seconde <br>
+			    <input type="radio" name="intervalle" value="3" >tierce &hearts;<br>
+			    <input type="radio" name="intervalle" value="4" >quarte &hearts;<br>
+			    <input type="radio" name="intervalle" value="5" checked>quinte &hearts; &hearts; &hearts;<br>
+			    <input type="radio" name="intervalle" value="6" >sixte &hearts;<br>
+			    <input type="radio" name="intervalle" value="7" >septième<br>
+			    <input type="radio" name="intervalle" value="8" >octave &hearts; &hearts; 
+		 </fieldset>	
+		 
+		 
+	</body>
+	<script>
+		let osc1,osc2, envelope;
+		
+		let scaleArray = [60, 62, 64, 65, 67, 69, 71, 72];
+		let intervalles = [1/1, 9/8, 5/4, 4/3, 3/2, 8/5, 15/8, 2/1];
+		let intervalle = 0;//intervalles[3];
+		let note = 0;
+		
+		let cnv ;
+		
+		function getActifSynthe()
+		{
+			if (document.getElementById("synthetiseur1").checked){
+				osc1.start();				
+			}else{
+				osc1.stop();				
+			}
+			if (document.getElementById("synthetiseur2").checked){
+				osc2.start();
+			}else{
+				osc2.stop();				
+			}				
+		}
+		
+		function getIntervalle()
+		{
+			var radioButtons = document.getElementsByName("intervalle");
+		    for(var i = 0; i < radioButtons.length; i++)
+		    {
+		        if(radioButtons[i].checked == true)
+		        {
+					let j = parseInt( radioButtons[i].value, 10) - 1;	
+					intervalle = intervalles[j];
+					//console.log(intervalle+"  "+j);
+		        }
+		    }		    
+		}
+		
+		
+		
+		function setup() {
+		  cnv = createCanvas(0, 0);	
+		 
+		  envelope1 = new p5.Env();
+		  envelope1.setADSR(0.21, 0.5, 0.9, 0.1);
+		  envelope1.setRange(1, 0.01);
+		  
+		  osc1 = new p5.SinOsc();
+		  osc1.start();
+		
+		  osc2 = new p5.SinOsc();
+		  osc2.start();
+		
+		  noStroke();
+		}
+		
+		function draw() {
+		  background(20);
+		
+		  if (frameCount % 60 === 0 || frameCount === 1) {
+			 
+			getIntervalle();
+			getActifSynthe();
+			 
+		    let midiValue = scaleArray[note];
+		    
+		    osc1.freq(midiToFreq(midiValue));
+		    osc2.freq(midiToFreq(midiValue)*intervalle);
+		    
+		    envelope1.play(osc1, 0.05, 0.1);
+		    envelope1.play(osc2, 0.05, 0.1);
+		    note = (note + 1) % scaleArray.length;
+		  }
+		
+		}
+	
+	</script>
+	
+</html>
