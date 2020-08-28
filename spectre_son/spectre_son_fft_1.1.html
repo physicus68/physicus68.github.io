@@ -1,0 +1,133 @@
+<html>
+  <head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="UTF-8">
+		<script src="p5.js"></script>
+		<script src="p5.sound.js"></script>
+		<style>	
+			html, body {
+				height: 100%;
+			}
+			
+			body {
+			  margin: 0;
+			  display: flex;	
+			  flex-direction: column;		
+			  justify-content: center;
+			  align-items: center;
+			}	
+		
+		</style>
+		
+  </head>
+
+  <body>
+	<h2>Analyse des fréquences d'un son en temps réel</h2>
+	<address>Wulfran Fortin (2020) </address>
+	<p>La barre <code>ESPACE</code> permet de faire une capture du signal ou de basculer en mode <code>temps réel</code></p>
+	<p></p>
+	
+	
+	<script>		
+		let mic, fft, Df ;
+		let spectrum, old_spectrum;
+		CAPTURE = false;
+		
+		marge = 20;
+		
+		function setup() {
+			createCanvas(1024, 400);
+			noFill();			
+			mic = new p5.AudioIn();
+			mic.start();			  
+			fft = new p5.FFT(0.8, 2 * 4096);
+			fft.setInput(mic);			
+			Df = sampleRate()/(2*fft.bins);		  
+		}
+		
+		function axes(){
+			textSize(10);
+			textAlign(CENTER);
+			textStyle(NORMAL);
+			stroke('blue');
+			for( f = 0 ; f < 20000 ; f = f + 500){
+				i = int(f / Df ) + marge;
+				line(i,0,i,height -2 * marge);
+				text(f,i,height -2 * marge + 15);				
+			}		
+			text("Fréquences (en Hz)",width*0.5 , height -2 * marge + 35);
+			stroke('black');		
+		}
+		
+		function curseurSouris(){
+			y_pos = mouseY ;
+			
+			freq  = int((mouseX - marge) * Df) ;
+			
+			if( freq > 0){
+
+				strokeWeight(3);
+				textSize(15);
+				stroke(255,0,0,255);
+				x_pos = int(freq / Df) +  marge;
+				line(x_pos ,0,x_pos,height -2 * marge);
+				
+				stroke(255,0,0,150);
+				x_pos = int(2*freq / Df) +  marge;
+				line(x_pos ,0,x_pos,height -2 * marge);
+	
+				stroke(255,0,0,100);			
+				x_pos = int(3*freq / Df) +  marge;
+				line(x_pos ,0,x_pos,height -2 * marge);
+				
+				stroke(255,0,0,50);			
+				x_pos = int(4*freq / Df) +  marge;
+				line(x_pos ,0,x_pos,height -2 * marge);
+				
+				strokeWeight(1);
+	
+				stroke(255,0,0,255);
+				x_pos = int(freq / Df) +  marge;						
+				text(freq+" Hz",x_pos+40,y_pos);	
+				stroke('black');
+			}
+						
+		}
+		
+		function keyReleased() {
+			if (keyCode === 32) {
+				CAPTURE = !CAPTURE;
+				
+			}
+		  return false;
+	    }
+		
+		function draw() {
+		  background(255);		  
+		  axes();
+		  if (CAPTURE){
+				spectrum = old_spectrum;
+		  }else{  
+				spectrum = fft.analyze();	
+				old_spectrum = spectrum;	
+		  }
+		  beginShape();
+		  for (i = 0; i < spectrum.length; i++) {
+		    vertex(i+marge, map(spectrum[i], 0, 255, height-2 * marge, 50));
+		  }
+		  endShape();		  
+		  
+		  curseurSouris();
+		 
+		}
+		
+		
+	
+	</script>
+  </body>
+</html>
+
+
+
+
+

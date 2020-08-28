@@ -1,0 +1,177 @@
+<html>
+  <head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="UTF-8">
+		<script src="p5.js"></script>
+		<script src="p5.sound.js"></script>
+		<style>	
+			html, body {
+				height: 100%;				
+			}
+			
+			body {
+			  margin: 0;
+			  display: flex;	
+			  flex-direction: column;		
+			  justify-content: center;
+			  align-items: center;
+			}	
+			
+			.slider {
+				width: 100%;
+			}
+			
+	
+				
+		</style>		
+  </head>
+
+  <body>
+	<h3>Analyse de l'amplitude d'un son en temps réel</h3>	
+	<p>La barre <code><b>ESPACE</b></code> permet de faire une capture du signal ou de
+		 basculer en mode <code><b>TEMPS REEL</b></code> <br>
+		 <br>
+		 Pour amplifier le signal, glisser le curseur 
+		<input type="range" min="1" max="500" value="50" class="slider" id="amplitude">
+	</p>
+	<p>
+		<i>Wulfran Fortin - 2020 -  Firefox conseillé</i>
+	</p>
+	
+	
+	<script>		
+		let mic, fft, Df ;
+		let waveform, old_waveform;
+		CAPTURE = false;
+		
+		// paramètres du graphique
+		marge = 35;
+		largeur = 1024 ;
+		hauteur = 400 ;		
+		amplification = 1.0; // multiplication du signal
+
+		// paramètres capture audio
+		let bins   =  1024;
+		let smooth =  0.8;
+		let dt     =  0.0;
+		
+		
+		// réglage de l'amplitude
+		var curseur = document.getElementById("amplitude");
+		curseur.oninput = function() {
+			amplification = this.value / 50.0 ;
+		}
+
+		function setup() {
+			createCanvas(largeur, hauteur + 2*marge);
+			noFill();					
+			mic = new p5.AudioIn();
+			mic.start();			  
+			fft = new p5.FFT(smooth, bins);
+			fft.setInput(mic);			
+			Df = sampleRate()/(2*fft.bins);	
+			dt = 1 / sampleRate();
+		}
+		
+		function axes(){
+			T_max = bins * dt *1000; 	// en ms
+			D_T_max = 0.5; 				// en ms
+			textSize(10);
+			textAlign(CENTER);
+			textStyle(NORMAL);
+			// dessin de la grille
+			// traits horizontaux				
+			for(a = 0 ; a <= 1 ; a =a + 0.1){
+				if (Math.trunc(a*100) % 20 === 0){
+					stroke('orange');
+					strokeWeight(2)
+				}else{
+					stroke('orange');
+					strokeWeight(1)
+				}
+				line(t2pix(0),a2pix(a),t2pix(T_max),a2pix(a));
+				line(t2pix(0),a2pix(-a),t2pix(T_max),a2pix(-a));
+			}
+			//  traits verticaux	
+			stroke('blue');
+			strokeWeight(2);
+			line(t2pix(0),a2pix(0),t2pix(T_max),a2pix(0));
+			strokeWeight(1);
+			for( t = 0 ; t < T_max ; t=t+D_T_max){
+				stroke('orange');	
+				strokeWeight(1);
+				if (t%1===0){
+					stroke('orange');
+					strokeWeight(2)				
+				} 
+				if (t%5===0 ){					
+					stroke('orange');
+					strokeWeight(1);
+				}
+				line(t2pix(t),a2pix(-1),t2pix(t),a2pix(1));	
+				if(t%2===0){
+					stroke('blue');
+					strokeWeight(0);
+					fill('blue');					
+					textStyle(ITALIC);
+					text(t,t2pix(t),a2pix(-1.08));
+					noFill();
+					strokeWeight(1);					
+				}
+			}
+			
+			stroke('blue');
+			strokeWeight(2);
+			rect(t2pix(0), a2pix(1), t2pix(T_max)-t2pix(0), a2pix(-1)-a2pix(1));
+			
+			noStroke();
+			fill('blue');
+			text("temps (en ms)",t2pix(T_max/2) , a2pix(-1.15));
+			noFill();
+			strokeWeight(1);
+					
+		}
+		
+		function t2pix(t){
+			return map(t,0,T_max,0, largeur-2*marge)+marge;
+		}
+		
+		function a2pix(a){
+			return map(a,1.0,-1,0, hauteur)+marge;
+		}
+
+		function keyReleased() {
+			if (keyCode === 32) {
+				CAPTURE = !CAPTURE;
+			}
+		  return false;
+	    }
+	    
+	    
+		
+		function draw() {
+		  background(255);		  
+		  axes();		  
+		  if (CAPTURE){
+			waveform = old_waveform;
+		  }else{  
+			waveform = fft.waveform();	
+			old_waveform = waveform;	
+		  }		
+		  beginShape();
+		  strokeWeight(2);
+		  stroke('red');
+		  
+		  for (i = 0; i < waveform.length; i++) {		  
+			vertex(t2pix(i*dt*1000),a2pix(waveform[i]*amplification));
+		  }
+		  endShape();	
+		}
+	</script>
+  </body>
+</html>
+
+
+
+
+
