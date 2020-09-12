@@ -1,0 +1,115 @@
+<html>
+
+<head>
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/tizzle/aframe-orbit-controls-component/v0.1.14/dist/aframe-orbit-controls-component.min.js"></script>
+</head>
+<script>
+    // dimensions du cristal
+    var xMax = 2;
+    var yMax = 5;
+    var zMax = 2;
+    var xMin = -2;
+    var yMin = 0;
+    var zMin = -2;
+    // génération des différents cristaux
+    AFRAME.registerComponent('initialisation', {
+        init: function () {
+            // cubique face centrée avec plans ABC
+            var sceneEl = document.querySelector('#cristalCFCcouleurs');
+            var x;
+            var y;
+            var z;
+            for (x = xMin; x < xMax + 1; x++) {
+                for (y = yMin; y < yMax + 1; y++) {
+                    for (z = zMin; z < zMax + 1; z++) {
+                        addCellule(x, y, z, sceneEl, "CFCcouleur");
+                    }
+                }
+            }           
+        }
+    });
+
+    function addCellule(x, y, z, scene, code) {
+        // en fonction de code, on construit la maille élémentaire
+        // cubique face centrée
+        if ((code == "CFCcouleur") || (code == "CFC")) {
+            addAtome(x, y, z, scene, code);
+            addAtome(x + 0.5, y + 0.5, z, scene, code);
+            addAtome(x + 0.5, y, z + 0.5, scene, code);
+            addAtome(x, y + 0.5, z + 0.5, scene, code);
+        }
+        // cubique simple
+        if (code == "CS") {
+            addAtome(x, y, z, scene, code);
+        }
+    }
+
+    function addAtome(x, y, z, scene, code) {
+        var couleurs = ['red', 'orange', 'yellow', 'gray', 'white'];
+        //  en fonction de code, on gère la couleur de l'atome
+        var c = couleurs[4];
+        if (code == "CFCcouleur") {
+            // plans ABCABC hexagonale compacte
+            var d = Math.abs((x + y + z) % 3);
+            c = couleurs[d];
+        }
+        if ((code == "CFC") || (code == "CS")) {
+            c = couleurs[3];
+        }
+        // maille élémentaire avec couleur spécifique
+        if ((x <= xMin + 1) && (y <= yMin + 1) && (z <= zMin + 1)) {
+            c = couleurs[4];
+        }
+        // dessin de l'atome, en fonction de code , on gère la taille de l'atome
+        var rayon = '0.5';
+        if ((code == "CFCcouleur") || code == "CFC") {
+            rayon = '0.354';
+        }
+        // construction de l'atome
+        var atome = document.createElement('a-sphere');
+        atome.setAttribute('position', x + ' ' + y + ' ' + z);
+        atome.setAttribute('radius', rayon);
+        if ((x <= xMax) && (y <= yMax) && (z <= zMax)) {
+            atome.setAttribute('color', c);
+            scene.appendChild(atome);
+        }
+    }
+</script>
+
+
+
+
+<body>
+    <a-scene    initialisation 
+                renderer='precision: medium; antialias:true'>
+
+        <!-- structure cubique face centrée avec plans ABCABC -->
+    
+        <a-entity id="target">
+            <a-entity id="cristalCFCcouleurs" scale='0.6 0.6 0.6' position="0.0 0.0 0.0" rotation="0.0 90.0 0.0 ">
+                <!-- rempli lors de l'initialisation-->
+            </a-entity>
+        </a-entity>            
+    
+        <a-entity
+        id="camera"
+        camera="fov: 80; zoom: 1;"
+        position="0 2 5"
+        orbit-controls="
+            autoRotate: false;
+            target: #target;
+            enableDamping: true;
+            dampingFactor: 0.125;
+            rotateSpeed:0.25;
+            minDistance:3;
+            maxDistance:100;
+            "
+        mouse-cursor="">
+        
+    </a-entity>
+    </a-scene>
+</body>
+
+
+</html>
