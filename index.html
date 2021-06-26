@@ -1,14 +1,80 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 
 <head>
-<meta charset="utf-8" />
-<title>Bonjour</title>
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+    <script>
+        window.addEventListener('camera-init', (data) => {
+            console.log('camera-init', data);
+        })
+
+        window.addEventListener('camera-error', (error) => {
+            console.log('camera-error', error);
+        })
+
+        AFRAME.registerComponent('registerevents', {
+            init: function () {
+                var marker = this.el;
+                const camera = document.querySelector('[camera]');
+
+                marker.addEventListener('markerFound', function () {
+                    var markerId = marker.id;
+                    console.log('markerFound', markerId);
+                    // TODO: Add your own code here to react to the marker being found.
+                    let cameraPosition = camera.object3D.position;
+                    let markerPosition = marker.object3D.position;
+                    let distance = cameraPosition.distanceTo(markerPosition)
+
+                    check = setInterval(() => {
+                        cameraPosition = camera.object3D.position;
+                        markerPosition = marker.object3D.position;
+                        distance = cameraPosition.distanceTo(markerPosition)
+                        // do what you want with the distance:
+                        console.log(distance);
+                    }, 100);
+                });
+
+                marker.addEventListener('markerLost', function () {
+                    var markerId = marker.id;
+                    console.log('markerLost', markerId);
+                    // TODO: Add your own code here to react to the marker being lost.
+                    clearInterval(check);
+                });
+            }
+        });
+    </script>
+
 </head>
 
-<body>
-	<p>Bonjour !</p>
-
+<body style="margin : 0px; overflow: hidden;">
+    <a-scene	
+			initialisation 
+			embedded arjs=' 
+					detectionMode: mono_and_matrix; 
+					matrixCodeType:  AR_MATRIX_CODE_3x3_PARITY65;
+					sourceType: webcam; 
+					sourceWidth:1024; 
+					sourceHeight:960; 
+					displayWidth: 1024; 
+					displayHeight: 960;
+					' 
+			renderer='
+					precision: high; 
+					antialias:false'>
+					
+        <a-marker type='barcode' value='0' id='marker-barcode-0' emitevents='true' registerevents>
+            <a-entity 
+					position="0 0 0" 
+					rotation="0 0 0" 
+					scale="0.5 0.5 0.5" 
+					gltf-model="ligne-champ.glb">
+			</a-entity>
+        </a-marker>
+        <a-entity camera></a-entity>
+    </a-scene>
 </body>
+
 
 </html>
