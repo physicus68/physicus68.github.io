@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta charset="UTF-8">
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <!-- ma bibliothèque -->
+    <script src="marker-cube.js"></script>
+</head>
+
+<body> 
+    <!-- exemple  http://localhost:8000/index.html?modele=cristal_cubique -->
+    <a-scene embedded arjs='    
+                        detectionMode: mono_and_matrix; 
+                        matrixCodeType: 3x3; 
+                        sourceType: webcam;
+                        sourceWidth: 1024;
+                        sourceHeight: 960;                            
+                        displayWidth: 1024;
+                        displayHeight: 960' light='defaultLightsEnabled:true'>
+
+        <a-assets>
+            <a-asset-item id="asset-modele" src="mire.glb"></a-asset-item>
+        </a-assets>
+
+        <!-- mon composant -->
+        <a-marker-cube modele="#asset-modele"></a-marker-cube>
+
+        <a-entity camera></a-entity>
+    </a-scene>
+
+</body>
+
+</html>
