@@ -1,0 +1,213 @@
+<html>
+  <head>
+    <title>Rail optique virtuel</title>
+    <link rel="icon" type="image/x-icon" href="#" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <!-- voir doc https://github.com/supermedium/superframe/tree/master/components/orbit-controls -->
+    <script src="https://unpkg.com/aframe-orbit-controls@1.3.0/dist/aframe-orbit-controls.min.js"></script>
+
+    <style>
+      body{
+        background-color: ghostwhite;
+      }
+      a-scene {
+        height: 480px;
+        width: 640px;
+        margin: auto;
+      }
+      #position-lanterne {
+        width: 300px;
+      }
+      #position-ecran {
+        width: 300px;
+      }
+
+      h1 {
+        text-align: center;
+        font-family: cursive;
+      }
+      .slidecontainer {
+        font-family: cursive;
+        margin: auto;        
+        width: 640px;
+        display: grid;
+        grid-template-columns: auto auto auto;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let poslampe_0 = -0.2;
+      let posecran_0 = 0.24;
+      let f = 0.1;
+      let gamma = -f / (f + poslampe_0);
+
+      let poslampeslider;
+      let posecranslider;
+
+      let poslampe = poslampe_0;
+      let posecran = posecran_0;
+      let imageName = "#0001";
+
+      AFRAME.registerComponent("position-lampe", {
+        init: function () {},
+        update: function () {},
+        tick: function () {
+          this.el.setAttribute("position", { x: 0, y: 0, z: -poslampe + 0.05 }); // offset pour Z
+        },
+      });
+
+      AFRAME.registerComponent("position-ecran", {        
+        init: function () {},
+        update: function () {},
+        tick: function () {
+          this.el.setAttribute("position", { x: 0, y: 0, z: -posecran }); // offset pour Z
+        },
+      });
+
+      AFRAME.registerComponent("position-grille", {        
+        init: function () {},
+        update: function () {},
+        tick: function () {
+          this.el.setAttribute("position", { x: 0, y: 0.10, z: -posecran+0.002 }); // offset pour Z
+        },
+      });
+
+      AFRAME.registerComponent("projection", {
+        init: function () {
+          this.el.setAttribute("src", imageName);
+          this.echelle = "" + -gamma + " " + gamma + " " + gamma;
+          this.el.setAttribute("scale", this.echelle);
+        },
+        update: function () {},
+        tick: function () {
+          this.el.setAttribute("src", imageName);
+          this.el.setAttribute("position", {
+            x: 0,
+            y: 0.1,
+            z: -posecran + 0.003,
+          });
+          this.echelle = "" + -gamma + " " + gamma + " " + gamma;
+          this.el.setAttribute("scale", this.echelle);
+        },
+      });
+    </script>
+    <h1>Rail optique virtuel</h1>
+    <div id="vue_3d">
+      <a-scene embedded vr-mode-ui="enabled: false" fog="type: linear; color: #202010; near:0.8 ; far: 2.5">
+        <a-assets>
+          <a-asset-item id="rail" src="assets/rail.glb"></a-asset-item>
+          <a-asset-item id="lanterne" src="assets/lanterne.glb"></a-asset-item>
+          <a-asset-item id="lentille" src="assets/lentille.glb"></a-asset-item>
+          <a-asset-item id="ecran" src="assets/ecran.glb"></a-asset-item>
+          <img id="grille" src="assets/grille.png"/>
+        </a-assets>
+        <a-entity gltf-model="#rail"></a-entity>
+        <a-entity gltf-model="#lentille"></a-entity>
+        <a-entity
+          position-lampe
+          gltf-model="#lanterne"
+          position=" 0 0 0"
+        ></a-entity>
+        <a-entity
+          position-ecran
+          gltf-model="#ecran"
+          position=" 0 0 0"
+        ></a-entity>
+        <a-image position-grille src="#grille"  position="0 0.10 -0.2" width="0.14" height="0.14" color="#808050"></a-image>
+        <a-image
+          projection
+          src="#0001"
+          position="0 0.10 -0.05"
+          width="0.08"
+          height="0.08"
+        ></a-image>
+
+        <a-sky color="#606060"></a-sky>
+
+        <a-entity
+          camera="fov:50"
+          look-controls
+          orbit-controls="target: 0 0 0; minDistance: 0.005; maxDistance: 5; initialPosition: 0.5 0.5 0.8"
+        ></a-entity>
+      </a-scene>
+    </div>
+
+    <div class="slidecontainer">
+      <label for="position-lanterne">Position de la lanterne</label>
+      <input
+        type="range"
+        min="0"
+        max="487"
+        value="0"
+        class="slider"
+        id="position-lanterne"
+      />
+      <output id="position-lanterne-output" for="position-lanterne"></output>
+
+      <label for="position-ecran">Position de l'écran</label>
+      <input
+        type="range"
+        min="0"
+        max="500"
+        value="0"
+        class="slider"
+        id="position-ecran"
+      />
+      <output id="position-ecran-output" for="position-ecran"></output>
+    </div>
+
+    <script>
+      let assets = document.getElementsByTagName("a-assets");
+      for (let n = 1; n < 26; n++) {
+        let src = "./assets/flou/flou" + String(n).padStart(4, "0") + ".png";
+        let img = document.createElement("img");
+        img.src = src;
+        img.id = String(n).padStart(4, "0");
+        assets[0].appendChild(img);
+      }
+
+      poslampeslider = document.getElementById("position-lanterne");
+      poslampeslider.value = Math.floor((0.6 + poslampe_0) / 0.001);
+
+      poslampesoutput = document.getElementById("position-lanterne-output");
+      poslampesoutput.textContent = "x = " + poslampe_0.toFixed(3) + " m";
+
+      poslampeslider.addEventListener("input", function () {
+        poslampe = -0.6 + 0.001 * this.value;
+        poslampesoutput.textContent = "x = " + poslampe.toFixed(3) + " m";
+        foyer();
+      });
+
+      posecranslider = document.getElementById("position-ecran");
+      posecranslider.value = Math.floor((-0.1 + posecran_0) / 0.001);
+      posecranoutput = document.getElementById("position-ecran-output");
+      posecranoutput.textContent = "x' =  " + posecran_0.toFixed(3) + " m";
+
+      foyer();
+
+      posecranslider.addEventListener("input", function () {
+        posecran = 0.1 + 0.001 * this.value;
+        posecranoutput.textContent = "x' =  " + posecran.toFixed(3) + " m";
+        foyer();
+      });
+
+      function foyer() {
+        let xp = posecran;
+        let x = poslampe;
+        let f = 0.1;
+        let xi = (x * f) / (f + x);
+        gamma = -xi / x;
+        let defocus = Math.abs((xi - xp) / xi);
+        let d = Math.floor(1.0 + (defocus * 24) / 0.4);
+        if (d > 24) {
+          d = 24;
+        }
+        imageName = "#" + String(d).padStart(4, "0");
+      }
+    </script>
+  </body>
+</html>
