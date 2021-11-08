@@ -25,7 +25,7 @@
         width: 300px;
       }
 
-      h1 {
+      h1,p,h4 {
         text-align: center;
         font-family: cursive;
       }
@@ -96,6 +96,7 @@
       });
     </script>
     <h1>Rail optique virtuel</h1>
+    <h4>W. Fortin - 2021</h4>
     <div id="vue_3d">
       <a-scene embedded vr-mode-ui="enabled: false" fog="type: linear; color: #202010; near:0.8 ; far: 2.5">
         <a-assets>
@@ -159,6 +160,7 @@
       />
       <output id="position-ecran-output" for="position-ecran"></output>
     </div>
+    <p>La lettre "F" de la source lumineuse a une hauteur de 17 mm.</p>
 
     <script>
       let assets = document.getElementsByTagName("a-assets");
