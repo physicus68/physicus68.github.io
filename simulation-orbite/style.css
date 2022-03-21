@@ -1,0 +1,32 @@
+body {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+h2 {
+  text-align: center;
+}
+a-scene {
+    /*min-height: 400px;*/
+    max-width: 80vh;
+}
+a-scene:after {
+    content: "";
+    display: block;
+    padding-bottom: 90%;
+  }
+
+#scene {
+  min-width: 300px;
+  max-width: 80vh;
+  margin:auto;
+  
+}
+
+#scene label {
+  display: block;
+  margin-top: 2em;
+  text-align: center;
+}
+#scene label input[type=range] {
+    width: 50%;
+}
