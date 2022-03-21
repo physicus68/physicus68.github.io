@@ -10,29 +10,40 @@
     <script src="https://unpkg.com/aframe-orbit-controls@1.3.0/dist/aframe-orbit-controls.min.js"></script>
 
     <style>
-      body{
+      body {
         background-color: ghostwhite;
+        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
       }
       a-scene {
-        height: 480px;
-        width: 640px;
+        height:60vh;
+        max-height: 600px;
+        width: 90vw;  
+        max-width: 1024px;      
         margin: auto;
       }
+      a-scene:after {
+        content: "";
+        display: block;
+        /*padding-bottom: 90%;*/
+      }
       #position-lanterne {
-        width: 300px;
+        width: 50vw;
+        max-width: 500px;
       }
       #position-ecran {
-        width: 300px;
+        width: 50vw;
+        max-width: 500px;
       }
 
-      h1,p,h4 {
+      h1,
+      p,
+      h4 {
         text-align: center;
-        font-family: cursive;
       }
       .slidecontainer {
-        font-family: cursive;
-        margin: auto;        
-        width: 640px;
+        margin: auto;
+        width: 90vw;
+        max-width: 1024px;
         display: grid;
         grid-template-columns: auto auto auto;
       }
@@ -60,7 +71,7 @@
         },
       });
 
-      AFRAME.registerComponent("position-ecran", {        
+      AFRAME.registerComponent("position-ecran", {
         init: function () {},
         update: function () {},
         tick: function () {
@@ -68,11 +79,15 @@
         },
       });
 
-      AFRAME.registerComponent("position-grille", {        
+      AFRAME.registerComponent("position-grille", {
         init: function () {},
         update: function () {},
         tick: function () {
-          this.el.setAttribute("position", { x: 0, y: 0.10, z: -posecran+0.002 }); // offset pour Z
+          this.el.setAttribute("position", {
+            x: 0,
+            y: 0.1,
+            z: -posecran + 0.002,
+          }); // offset pour Z
         },
       });
 
@@ -98,13 +113,17 @@
     <h1>Rail optique virtuel</h1>
     <h4>W. Fortin - 2021</h4>
     <div id="vue_3d">
-      <a-scene embedded vr-mode-ui="enabled: false" fog="type: linear; color: #202010; near:0.8 ; far: 2.5">
+      <a-scene
+        embedded
+        vr-mode-ui="enabled: false"
+        fog="type: linear; color: #202010; near:1.8 ; far: 3.5"
+      >
         <a-assets>
           <a-asset-item id="rail" src="assets/rail.glb"></a-asset-item>
           <a-asset-item id="lanterne" src="assets/lanterne.glb"></a-asset-item>
           <a-asset-item id="lentille" src="assets/lentille.glb"></a-asset-item>
           <a-asset-item id="ecran" src="assets/ecran.glb"></a-asset-item>
-          <img id="grille" src="assets/grille.png"/>
+          <img id="grille" src="assets/grille.png" />
         </a-assets>
         <a-entity gltf-model="#rail"></a-entity>
         <a-entity gltf-model="#lentille"></a-entity>
@@ -118,7 +137,14 @@
           gltf-model="#ecran"
           position=" 0 0 0"
         ></a-entity>
-        <a-image position-grille src="#grille"  position="0 0.10 -0.2" width="0.14" height="0.14" color="#808050"></a-image>
+        <a-image
+          position-grille
+          src="#grille"
+          position="0 0.10 -0.2"
+          width="0.14"
+          height="0.14"
+          color="#808050"
+        ></a-image>
         <a-image
           projection
           src="#0001"
@@ -131,7 +157,7 @@
 
         <a-entity
           camera="fov:50"
-          look-controls
+          look-controls="enabled: false"
           orbit-controls="target: 0 0 0; minDistance: 0.005; maxDistance: 5; initialPosition: 0.5 0.5 0.8"
         ></a-entity>
       </a-scene>
