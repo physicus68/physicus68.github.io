@@ -1,0 +1,63 @@
+a-scene {
+    height: 600px;
+    width: 800px;
+    margin: auto;
+    border-style: solid;
+    border-color: black;
+    background-color: black;
+}
+
+body {
+    background-color: aliceblue;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h1,
+h3 {
+    margin: auto;
+    width: fit-content;
+    margin-bottom: 1em;
+}
+
+input {
+    margin-right: 1em;
+}
+
+#controle {
+    width: 800px;
+    margin: auto;
+    margin-top: 1em;
+    display: grid;
+    grid-template-columns: 1fr 2fr 0.5fr;
+    gap: 1em;
+}
+
+@media screen and (max-width: 800px) {
+
+    h1,
+    h3 {
+        margin: auto;
+        width: fit-content;        
+    }
+    #cuve_a_onde {
+        margin: 3px;    
+    }
+
+    #controle {
+        width: 90vw;
+        margin: auto;
+        margin-top: 1em;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;        
+    }
+
+    a-scene {
+        height: 40vh;
+        width: 90vw;
+        margin: auto;
+        border-style: solid;
+        border-color: black;
+        background-color: black;
+    }
+
+}
